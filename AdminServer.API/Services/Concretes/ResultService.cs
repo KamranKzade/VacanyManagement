@@ -45,31 +45,37 @@ namespace AdminServer.API.Services.Concretes
 			}
 		}
 
-		public async Task<Response<Result>> GetResultByAppierId(AnswerForResultDto dto)
+		public async Task<Response<Result>> PostResultByAppierId(AnswerForResultDto dto)
 		{
 			var result = await _resultRepository.GetIQueryable().Include(x => x.Vacancy).Include(x => x.Applier).FirstOrDefaultAsync(m => m.Applier.Id.ToString() == dto.AppierId);
-			if (result is not null)
+			if (result is null)
 			{
-				Dictionary<string, string> dictionary = JsonSerializer.Deserialize<Dictionary<string, string>>(dto.Answer)!;
 				int count = 0;
 				int correctAnswerCounter = 0;
 
-				foreach (var item in dictionary)
+				foreach (var item in dto.Answer)
 				{
-					var question = await _questionRepository.GetIQueryable().Include(x=>x.Answers).FirstOrDefaultAsync(x => x.Id.ToString() == item.Key);
-					if(question.Answers.FirstOrDefault(x=>item.Value==x.Id.ToString())!.IsTrue)
+					var question = await _questionRepository.GetIQueryable().Include(x => x.Answers).FirstOrDefaultAsync(x => x.Id.ToString() == item.Key);
+
+					if (question.Answers.Where(x => x.IsTrue == true).First().Id.ToString() == item.Value)
 						correctAnswerCounter++;
 
 					count++;
 
 				}
 
-				result.Score = correctAnswerCounter;
-				result.ScorePercent = (correctAnswerCounter / count) * 100;
+				var newResult = new Result()
+				{
+					Id = Guid.NewGuid(),
+					ApplierId = Guid.Parse(dto.AppierId),
+					Score = correctAnswerCounter,
+					ScorePercent = (correctAnswerCounter / count) * 100,
+					VacancyId = Guid.Parse(dto.VacancyId)
+				};
 
-				_resultRepository.Update(result);
+				await _resultRepository.AddAsync(newResult);
 				await _unitOfWork.CommitAsync();
-				
+
 				return Response<Result>.Success(result, StatusCodes.Status200OK);
 			}
 

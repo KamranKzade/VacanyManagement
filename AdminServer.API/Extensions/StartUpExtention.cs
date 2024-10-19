@@ -3,6 +3,7 @@ using AdminServer.API.Services.Abstracts;
 using AdminServer.API.Services.Concretes;
 using Microsoft.EntityFrameworkCore;
 using OrderServer.API.Repositories.Concrete;
+using Serilog;
 using SharedLibrary.Repositories.Abstract;
 using SharedLibrary.UnitOfWork.Abstract;
 using SharedLibrary.UnitOfWork.Concrete;
@@ -39,5 +40,22 @@ public static class StartUpExtention
 		services.AddScoped(typeof(IGenericRepository<,>), typeof(GenericRepository<,>));
 		services.AddScoped<IUnitOfWork, UnitOfWork<AppDbContext>>();
 		return services;
+	}
+
+	public static async void AddMigrationWithExtention(this IServiceProvider provider)
+	{
+		try
+		{
+			using (var scope = provider.CreateScope())
+			{
+				var someService = scope.ServiceProvider.GetRequiredService<AppDbContext>();
+				await someService.Database.MigrateAsync();
+			}
+
+		}
+		catch (Exception ex)
+		{
+			Log.Error($"Error: {ex.Message}");
+		}
 	}
 }

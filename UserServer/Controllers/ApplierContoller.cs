@@ -72,7 +72,7 @@ namespace UserServer.API.Controllers
 
 		[Authorize()]
 		[HttpPost("SendAnswerToAdminServer")]
-		public async Task<IActionResult> SendAnswerToAdminServer(SendAnswerDto dto)
+		public async Task<IActionResult> SendAnswerToAdminServer([FromBody]SendAnswerDto dto)
 		{
 			string authorizationToken = HttpContext.Request.Headers["Authorization"].ToString().Replace("Bearer ", "");
 

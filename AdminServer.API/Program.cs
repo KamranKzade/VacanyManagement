@@ -24,6 +24,8 @@ builder.Services.AddSwaggerGen(c => SwaggerHelper.ConfigureSwaggerGen(c));
 var app = builder.Build();
 
 
+app.Services.AddMigrationWithExtention();
+
 app.UseSwagger(c => SwaggerHelper.ConfigureSwagger(c));
 app.UseSwaggerUI(c => SwaggerHelper.ConfigureSwaggerUI(c));
 

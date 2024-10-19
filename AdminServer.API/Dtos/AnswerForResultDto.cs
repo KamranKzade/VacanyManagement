@@ -3,8 +3,9 @@
 public class AnswerForResultDto
 {
     public string AppierId { get; set; }
+    public string VacancyId { get; set; }
 
     // Key --> QuestionId
     // Value --> AnswerId
-    public string Answer { get; set; }
+    public Dictionary<string, string> Answer { get; set; }
 }

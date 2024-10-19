@@ -17,11 +17,11 @@ public class ResultController : CustomBaseController
 		_resultService = resultService;
 	}
 
-	[HttpGet]
+	[HttpPost]
 	[Authorize()]
-	public async Task<IActionResult> Get([FromBody]AnswerForResultDto dto)
+	public async Task<IActionResult> Post([FromBody]AnswerForResultDto dto)
 	{
-		var result = await _resultService.GetResultByAppierId(dto);
+		var result = await _resultService.PostResultByAppierId(dto);
 		return ActionResultInstance(result);
 	}
 
